@@ -11,6 +11,7 @@ import stryker4s.report.model._
 import stryker4s.scalatest.FileUtil
 import stryker4s.testutil.Stryker4sSuite
 
+import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 import scala.meta.{Lit, Term}
 
@@ -61,7 +62,8 @@ class MutantRunResultMapperTest extends Stryker4sSuite with Inside {
                              Location(Position(6, 31), Position(6, 37)),
                              MutantStatus.Survived)
               )
-              source should equal(Files.readString(FileUtil.getResource("scalaFiles/ExampleClass.scala")))
+              source should equal(
+                Files.readAllLines(FileUtil.getResource("scalaFiles/ExampleClass.scala")).asScala.mkString("\n"))
           }
       }
     }

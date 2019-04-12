@@ -7,6 +7,8 @@ import stryker4s.model._
 import stryker4s.report.model.MutantStatus.MutantStatus
 import stryker4s.report.model._
 
+import scala.collection.JavaConverters._
+
 trait MutantRunResultMapper {
 
   private val schemaVersion = "1"
@@ -58,6 +60,6 @@ trait MutantRunResultMapper {
   }
 
   private def fileContentAsString(path: Path)(implicit config: Config): String =
-    Files.readString(config.baseDir / path.toString)
+    Files.readAllLines(config.baseDir / path.toString).asScala.mkString("\n")
 
 }

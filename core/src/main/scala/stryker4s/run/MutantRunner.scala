@@ -62,7 +62,7 @@ abstract class MutantRunner(sourceCollector: SourceCollector, reporter: Reporter
   private def writeMutatedFile(mutatedFile: MutatedFile): Path = {
     val filePath = mutatedFile.fileOrigin.inSubDir(tmpDir)
     if (!Files.exists(filePath)) Files.createFile(filePath)
-    Files.writeString(filePath, mutatedFile.tree.syntax, StandardOpenOption.TRUNCATE_EXISTING)
+    Files.write(filePath, mutatedFile.tree.syntax.getBytes(), StandardOpenOption.TRUNCATE_EXISTING)
   }
 
   private def runMutants(mutatedFiles: Iterable[MutatedFile]): Iterable[MutantRunResult] = {
