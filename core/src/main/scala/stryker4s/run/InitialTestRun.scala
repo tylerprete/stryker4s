@@ -1,11 +1,12 @@
 package stryker4s.run
-import better.files.File
+import java.nio.file.Path
+
 import grizzled.slf4j.Logging
 import stryker4s.extension.exception.InitialTestRunFailedException
 
 trait InitialTestRun extends Logging {
 
-  def initialTestRun(tmpDir: File): Unit = {
+  def initialTestRun(tmpDir: Path): Unit = {
     info("Starting initial test run...")
     if (!runInitialTest(tmpDir)) {
       throw InitialTestRunFailedException(
@@ -15,6 +16,6 @@ trait InitialTestRun extends Logging {
     info("Initial test run succeeded! Testing mutants...")
   }
 
-  def runInitialTest(workingDir: File): Boolean
+  def runInitialTest(workingDir: Path): Boolean
 
 }

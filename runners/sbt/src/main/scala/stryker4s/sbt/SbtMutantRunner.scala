@@ -2,7 +2,6 @@ package stryker4s.sbt
 import java.io.{PrintStream, File => JFile}
 import java.nio.file.Path
 
-import better.files.{File, _}
 import sbt.Keys._
 import sbt._
 import sbt.internal.LogManager
@@ -53,14 +52,14 @@ class SbtMutantRunner(state: State, sourceCollector: SourceCollector, reporter: 
 
   private val newState = extracted.appendWithSession(settings, state)
 
-  override def runInitialTest(workingDir: File): Boolean = runTests(
+  override def runInitialTest(workingDir: Path): Boolean = runTests(
     newState,
     throw InitialTestRunFailedException(s"Unable to execute initial test run. Sbt is unable to find the task 'test'."),
     onSuccess = true,
     onFailed = false
   )
 
-  override def runMutant(mutant: Mutant, workingDir: File): Path => MutantRunResult = {
+  override def runMutant(mutant: Mutant, workingDir: Path): Path => MutantRunResult = {
     val mutationState = extracted.appendWithSession(settings :+ mutationSetting(mutant.id), newState)
     runTests(
       mutationState, { p: Path =>
@@ -85,5 +84,5 @@ class SbtMutantRunner(state: State, sourceCollector: SourceCollector, reporter: 
     javaOptions in Test += s"-DACTIVE_MUTATION=${String.valueOf(mutation)}"
 
   private def tmpDirFor(conf: Configuration): Def.Initialize[JFile] =
-    (scalaSource in conf)(_.toScala)(source => (source inSubDir tmpDir).toJava)
+    (scalaSource in conf)(_.asPath)(source => source inSubDir tmpDir)(_.toFile)
 }

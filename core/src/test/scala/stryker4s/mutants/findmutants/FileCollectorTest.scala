@@ -1,8 +1,10 @@
 package stryker4s.mutants.findmutants
 
-import better.files.File
+import java.nio.file.Path
+
 import org.mockito.integrations.scalatest.MockitoFixture
 import stryker4s.config.Config
+import stryker4s.extension.FileExtensions._
 import stryker4s.run.process.{Command, ProcessRunner}
 import stryker4s.scalatest.{FileUtil, LogMatchers}
 import stryker4s.testutil.Stryker4sSuite
@@ -12,16 +14,16 @@ import scala.util.{Failure, Try}
 
 class FileCollectorTest extends Stryker4sSuite with MockitoFixture with LogMatchers {
 
-  private val filledDirPath: File = FileUtil.getResource("fileTests/filledDir")
-  private val basePath: File = filledDirPath / "src/main/scala/package"
+  private val filledDirPath: Path = FileUtil.getResource("fileTests/filledDir")
+  private val basePath: Path = filledDirPath / "src/main/scala/package"
 
-  assume(filledDirPath.exists(), "Filled test dir does not exist")
-  assume(basePath.exists(), "Basepath dir does not exist")
+  assume(filledDirPath.toFile.exists(), s"Filled test dir $filledDirPath does not exist")
+  assume(basePath.toFile.exists(), s"Basepath dir $basePath does not exist")
 
   describe("collect files to mutate") {
     describe("on empty dir") {
       val emptyDir = FileUtil.getResource("fileTests/emptyDir")
-      assume(emptyDir.exists(), "Empty test dir does not exist")
+      assume(emptyDir.toFile.exists(), s"Empty test dir $emptyDir does not exist")
 
       it("should not collect the baseDir") {
         implicit val config: Config = Config(baseDir = emptyDir)
@@ -51,9 +53,8 @@ class FileCollectorTest extends Stryker4sSuite with MockitoFixture with LogMatch
         val sut = new FileCollector(TestProcessRunner())
 
         val results = sut.collectFilesToMutate()
-        val onlyResult = results.loneElement
 
-        onlyResult should equal(basePath / "secondFile.scala")
+        results should contain only (basePath / "secondFile.scala")
       }
 
       it("should find no matches with a non-matching glob") {
@@ -221,7 +222,7 @@ class FileCollectorTest extends Stryker4sSuite with MockitoFixture with LogMatch
             basePath / "otherFile.notScala",
             basePath / "target.scala")
       val gitProcessResult = Failure(new Exception("Exception"))
-      when(processRunnerMock(any[Command], any[File])).thenReturn(gitProcessResult)
+      when(processRunnerMock(any[Command], any[Path])).thenReturn(gitProcessResult)
 
       val sut = new FileCollector(processRunnerMock)
 
@@ -249,7 +250,7 @@ class FileCollectorTest extends Stryker4sSuite with MockitoFixture with LogMatch
       it("Should log that no files config option is found and is using fallback to copy all files") {
         implicit val config: Config = Config(baseDir = filledDirPath)
         val gitProcessResult = Failure(new Exception(""))
-        when(processRunnerMock(any[Command], any[File])).thenReturn(gitProcessResult)
+        when(processRunnerMock(any[Command], any[Path])).thenReturn(gitProcessResult)
 
         val sut = new FileCollector(processRunnerMock)
 

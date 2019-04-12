@@ -1,8 +1,8 @@
 package stryker4s.config
 
 import java.io.FileNotFoundException
+import java.nio.file.{Path, Paths}
 
-import better.files.File
 import grizzled.slf4j.Logging
 import pureconfig.error.{CannotReadFile, ConfigReaderException, ConfigReaderFailures}
 import pureconfig.generic.auto._
@@ -12,8 +12,8 @@ object ConfigReader extends ConfigReaderImplicits with Logging {
 
   /** Read config from stryker4s.conf. Or use the default Config if no config file is found.
     */
-  def readConfig(confFile: File = File.currentWorkingDirectory / "stryker4s.conf"): Config =
-    pureconfig.loadConfig[Config](confFile.path, namespace = "stryker4s") match {
+  def readConfig(confFile: Path = Paths.get("stryker4s.conf")): Config =
+    pureconfig.loadConfig[Config](confFile, namespace = "stryker4s") match {
       case Left(failures) => tryRecoverFromFailures(failures)
       case Right(config) =>
         info("Using stryker4s.conf in the current working directory")

@@ -1,8 +1,7 @@
 package stryker4s.run
 
-import java.nio.file.Path
+import java.nio.file.{Files, Path, StandardCopyOption, StandardOpenOption}
 
-import better.files.File
 import grizzled.slf4j.Logging
 import stryker4s.config.Config
 import stryker4s.extension.FileExtensions._
@@ -18,11 +17,10 @@ abstract class MutantRunner(sourceCollector: SourceCollector, reporter: Reporter
     with MutationScoreCalculator
     with Logging {
 
-  val tmpDir: File = {
+  val tmpDir: Path = {
     val targetFolder = config.baseDir / "target"
-    targetFolder.createDirectoryIfNotExists()
-
-    File.newTemporaryDirectory("stryker4s-", Some(targetFolder))
+    Files.createDirectories(targetFolder)
+    Files.createTempDirectory(targetFolder, "stryker4s-")
   }
 
   def apply(mutatedFiles: Iterable[MutatedFile]): MutantRunResults = {
@@ -53,17 +51,18 @@ abstract class MutantRunner(sourceCollector: SourceCollector, reporter: Reporter
     mutatedFiles.foreach(writeMutatedFile)
   }
 
-  private def copyFile(file: File): Unit = {
+  private def copyFile(file: Path): Unit = {
     val filePath = tmpDir / file.relativePath.toString
 
-    filePath.createIfNotExists(file.isDirectory, createParents = true)
+    Files.createDirectories(filePath)
 
-    file.copyTo(filePath, overwrite = true)
+    Files.copy(file, filePath, StandardCopyOption.REPLACE_EXISTING)
   }
 
-  private def writeMutatedFile(mutatedFile: MutatedFile): File = {
+  private def writeMutatedFile(mutatedFile: MutatedFile): Path = {
     val filePath = mutatedFile.fileOrigin.inSubDir(tmpDir)
-    filePath.overwrite(mutatedFile.tree.syntax)
+    if (!Files.exists(filePath)) Files.createFile(filePath)
+    Files.writeString(filePath, mutatedFile.tree.syntax, StandardOpenOption.TRUNCATE_EXISTING)
   }
 
   private def runMutants(mutatedFiles: Iterable[MutatedFile]): Iterable[MutantRunResult] = {
@@ -81,6 +80,6 @@ abstract class MutantRunner(sourceCollector: SourceCollector, reporter: Reporter
     }
   }
 
-  def runMutant(mutant: Mutant, workingDir: File): Path => MutantRunResult
+  def runMutant(mutant: Mutant, workingDir: Path): Path => MutantRunResult
 
 }

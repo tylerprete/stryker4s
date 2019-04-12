@@ -35,7 +35,6 @@ object Settings {
       Dependencies.pureconfig,
       Dependencies.scalameta,
       Dependencies.scalametaContrib,
-      Dependencies.betterFiles,
       Dependencies.log4jApi,
       Dependencies.log4jCore,
       Dependencies.grizzledSlf4j,

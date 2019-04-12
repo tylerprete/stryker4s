@@ -1,6 +1,7 @@
 package stryker4s.mutants
 
-import better.files.File
+import java.nio.file.Path
+
 import grizzled.slf4j.Logging
 import stryker4s.model.{MutatedFile, MutationsInSource, SourceTransformations}
 import stryker4s.mutants.applymutants.{MatchBuilder, StatementTransformer}
@@ -11,7 +12,7 @@ import scala.meta.Tree
 class Mutator(mutantFinder: MutantFinder, transformer: StatementTransformer, matchBuilder: MatchBuilder)
     extends Logging {
 
-  def mutate(files: Iterable[File]): Iterable[MutatedFile] = {
+  def mutate(files: Iterable[Path]): Iterable[MutatedFile] = {
     val mutatedFiles = files
       .map { file =>
         val mutationsInSource = findMutants(file)
@@ -29,7 +30,7 @@ class Mutator(mutantFinder: MutantFinder, transformer: StatementTransformer, mat
 
   /** Step 1: Find mutants in the found files
     */
-  private def findMutants(file: File): MutationsInSource = mutantFinder.mutantsInFile(file)
+  private def findMutants(file: Path): MutationsInSource = mutantFinder.mutantsInFile(file)
 
   /** Step 2: transform the statements of the found mutants (preparation of building pattern matches)
     */

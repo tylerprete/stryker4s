@@ -1,7 +1,9 @@
 package stryker4s.config
 
-import better.files.File
+import java.nio.file.Paths
+
 import pureconfig.error.{ConfigReaderException, ConvertFailure}
+import stryker4s.files.File
 import stryker4s.scalatest.{FileUtil, LogMatchers}
 import stryker4s.testutil.Stryker4sSuite
 
@@ -9,7 +11,7 @@ class ConfigReaderTest extends Stryker4sSuite with LogMatchers {
 
   describe("loadConfig") {
     it("should load default config with a nonexistent conf file") {
-      val confPath = File("nonExistentFile.conf")
+      val confPath = Paths.get("nonExistentFile.conf")
 
       val result = ConfigReader.readConfig(confPath)
 
@@ -42,7 +44,7 @@ class ConfigReaderTest extends Stryker4sSuite with LogMatchers {
 
       val result = ConfigReader.readConfig(confPath)
 
-      result.baseDir shouldBe File("/tmp/project")
+      result.baseDir shouldBe Paths.get("/tmp/project")
       result.mutate shouldBe Seq("bar/src/main/**/*.scala", "foo/src/main/**/*.scala", "!excluded/file.scala")
       result.testRunner shouldBe an[CommandRunner]
       result.reporters should contain only (ConsoleReporterType, HtmlReporterType)
@@ -81,11 +83,11 @@ class ConfigReaderTest extends Stryker4sSuite with LogMatchers {
     }
 
     it("should log warnings when no config file is found") {
-      val confPath = File("nonExistentFile.conf")
+      val confPath = Paths.get("nonExistentFile.conf")
 
       val sut = ConfigReader.readConfig(confPath)
 
-      s"Could not find config file ${File.currentWorkingDirectory / "nonExistentFile.conf"}" shouldBe loggedAsWarning
+      s"Could not find config file nonExistentFile.conf" shouldBe loggedAsWarning
       "Using default config instead..." shouldBe loggedAsWarning
       // Ignored due to transitive dependency clash in sbt
       // s"Config used: ${sut.toHoconString}" shouldBe loggedAsInfo

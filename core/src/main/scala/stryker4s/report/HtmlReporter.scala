@@ -1,6 +1,7 @@
 package stryker4s.report
 import grizzled.slf4j.Logging
 import stryker4s.config.Config
+import stryker4s.extension.FileExtensions.SlashExtension
 import stryker4s.files.FileIO
 import stryker4s.model.MutantRunResults
 import stryker4s.report.mapper.MutantRunResultMapper

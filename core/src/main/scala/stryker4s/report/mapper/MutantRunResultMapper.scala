@@ -1,7 +1,8 @@
 package stryker4s.report.mapper
-import java.nio.file.Path
+import java.nio.file.{Files, Path}
 
 import stryker4s.config.{Config, Thresholds => ConfigThresholds}
+import stryker4s.extension.FileExtensions._
 import stryker4s.model._
 import stryker4s.report.model.MutantStatus.MutantStatus
 import stryker4s.report.model._
@@ -57,6 +58,6 @@ trait MutantRunResultMapper {
   }
 
   private def fileContentAsString(path: Path)(implicit config: Config): String =
-    (config.baseDir / path.toString).contentAsString
+    Files.readString(config.baseDir / path.toString)
 
 }

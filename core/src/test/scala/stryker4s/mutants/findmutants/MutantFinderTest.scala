@@ -1,8 +1,7 @@
 package stryker4s.mutants.findmutants
 
-import java.nio.file.NoSuchFileException
+import java.nio.file.{NoSuchFileException, Paths}
 
-import better.files.File
 import stryker4s.config.{Config, ExcludedMutations}
 import stryker4s.extension.FileExtensions._
 import stryker4s.scalatest.{FileUtil, LogMatchers, TreeEquality}
@@ -48,7 +47,7 @@ class MutantFinderTest extends Stryker4sSuite with TreeEquality with LogMatchers
 
     it("should fail on a nonexistent file") {
       val sut = new MutantFinder(new MutantMatcher)
-      val noFile = File("this/does/not/exist.scala")
+      val noFile = Paths.get("this/does/not/exist.scala")
 
       lazy val result = sut.parseFile(noFile)
 

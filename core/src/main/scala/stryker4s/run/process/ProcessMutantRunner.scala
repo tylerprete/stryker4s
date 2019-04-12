@@ -2,7 +2,6 @@ package stryker4s.run.process
 
 import java.nio.file.Path
 
-import better.files.File
 import stryker4s.config.Config
 import stryker4s.model._
 import stryker4s.mutants.findmutants.SourceCollector
@@ -18,7 +17,7 @@ class ProcessMutantRunner(command: Command,
                           reporter: Reporter)(implicit config: Config)
     extends MutantRunner(sourceCollector, reporter) {
 
-  def runMutant(mutant: Mutant, workingDir: File): Path => MutantRunResult = {
+  def runMutant(mutant: Mutant, workingDir: Path): Path => MutantRunResult = {
     val id = mutant.id
     processRunner(command, workingDir, ("ACTIVE_MUTATION", id.toString)) match {
       case Success(0)                         => Survived(mutant, _)
@@ -28,7 +27,7 @@ class ProcessMutantRunner(command: Command,
     }
   }
 
-  override def runInitialTest(workingDir: File): Boolean = {
+  override def runInitialTest(workingDir: Path): Boolean = {
     processRunner(command, workingDir, ("ACTIVE_MUTATION", "None")) match {
       case Success(0)                         => true
       case Success(exitCode) if exitCode != 0 => false

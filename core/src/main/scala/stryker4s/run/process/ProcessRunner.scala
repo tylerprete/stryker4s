@@ -1,6 +1,7 @@
 package stryker4s.run.process
 
-import better.files.File
+import java.nio.file.Path
+
 import grizzled.slf4j.Logging
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -11,15 +12,15 @@ import scala.util.Try
 
 trait ProcessRunner extends Logging {
 
-  def apply(command: Command, workingDir: File): Try[Seq[String]] = {
+  def apply(command: Command, workingDir: Path): Try[Seq[String]] = {
     Try {
-      Process(s"${command.command} ${command.args}", workingDir.toJava)
+      Process(s"${command.command} ${command.args}", workingDir.toFile)
         .lineStream(ProcessLogger(debug(_)))
     }
   }
 
-  def apply(command: Command, workingDir: File, envVar: (String, String)): Try[Int] = {
-    val mutantProcess = Process(s"${command.command} ${command.args}", workingDir.toJava, envVar)
+  def apply(command: Command, workingDir: Path, envVar: (String, String)): Try[Int] = {
+    val mutantProcess = Process(s"${command.command} ${command.args}", workingDir.toFile, envVar)
       .run(ProcessLogger(debug(_)))
 
     val exitCodeFuture = Future(mutantProcess.exitValue())

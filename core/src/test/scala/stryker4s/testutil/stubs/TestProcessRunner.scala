@@ -1,6 +1,7 @@
 package stryker4s.testutil.stubs
 
-import better.files.File
+import java.nio.file.Path
+
 import stryker4s.run.process.{Command, ProcessRunner}
 
 import scala.util.{Success, Try}
@@ -17,7 +18,7 @@ class TestProcessRunner(initialTestRunSuccess: Boolean, testRunExitCode: Try[Int
     * Keep track on the amount of times the function is called.
     * Also return an exit code which the test runner would do as well.
     */
-  override def apply(command: Command, workingDir: File, envVar: (String, String)): Try[Int] = {
+  override def apply(command: Command, workingDir: Path, envVar: (String, String)): Try[Int] = {
     if (envVar._2.equals("None")) {
       Success(if (initialTestRunSuccess) { 0 } else { 1 })
     } else {

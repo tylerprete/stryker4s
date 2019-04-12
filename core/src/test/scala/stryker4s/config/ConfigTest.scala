@@ -1,6 +1,8 @@
 package stryker4s.config
 
-import better.files.File
+import java.nio.file.{Files, Paths}
+
+import stryker4s.files.File
 import stryker4s.testutil.Stryker4sSuite
 
 class ConfigTest extends Stryker4sSuite {
@@ -11,7 +13,7 @@ class ConfigTest extends Stryker4sSuite {
       val result = sut.toHoconString
 
       val expected =
-        s"""base-dir="${File.currentWorkingDirectory.pathAsString.replace("\\", "\\\\")}"
+        s"""base-dir="${File.currentWorkingDirectory.toString.replace("\\", "\\\\")}"
            |excluded-mutations=[]
            |mutate=[
            |    "**/main/scala/**/*.scala"
@@ -36,14 +38,14 @@ class ConfigTest extends Stryker4sSuite {
     it("should print toString with changed values") {
       val filePaths = List("**/main/scala/**/Foo.scala", "**/main/scala/**/Bar.scala")
       val sut = Config(filePaths,
-                       File("tmp"),
+                       Paths.get("tmp"),
                        testRunner = CommandRunner("mvn", "clean test"),
                        excludedMutations = ExcludedMutations(Set("BooleanLiteral")))
 
       val result = sut.toHoconString
 
       val expected =
-        s"""base-dir="${File("tmp").pathAsString.replace("\\", "\\\\")}"
+        s"""base-dir=tmp
            |excluded-mutations=[
            |    BooleanLiteral
            |]

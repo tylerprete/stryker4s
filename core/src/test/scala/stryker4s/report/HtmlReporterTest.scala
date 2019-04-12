@@ -1,5 +1,6 @@
 package stryker4s.report
-import better.files.File
+import java.nio.file.Path
+
 import org.mockito.captor.ArgCaptor
 import org.mockito.{ArgumentMatchersSugar, MockitoSugar}
 import stryker4s.config.Config
@@ -75,16 +76,16 @@ class HtmlReporterTest extends Stryker4sSuite with MockitoSugar with ArgumentMat
 
       sut.reportRunFinished(runResults)
 
-      val indexCaptor = ArgCaptor[File]
-      val reportCaptor = ArgCaptor[File]
+      val indexCaptor = ArgCaptor[Path]
+      val reportCaptor = ArgCaptor[Path]
       verify(mockFileIO).createAndWrite(indexCaptor, any[Iterator[Char]])
       verify(mockFileIO).createAndWrite(reportCaptor, any[String])
-      val paths = List(indexCaptor.value, reportCaptor.value).map(_.pathAsString)
+      val paths = List(indexCaptor.value, reportCaptor.value).map(_.toString)
 
       // ends with target/stryker4s-report-$TIMESTAMP/filename.extension
       all(paths) should fullyMatch regex ".*target(/|\\\\)stryker4s-report-(\\d*)(/|\\\\)[a-z]*\\.[a-z]*$"
-      indexCaptor.value.name should be("index.html")
-      reportCaptor.value.name should be("report.js")
+      indexCaptor.value.getFileName.toString should be("index.html")
+      reportCaptor.value.getFileName.toString should be("report.js")
     }
 
     it("should debug log a message") {
