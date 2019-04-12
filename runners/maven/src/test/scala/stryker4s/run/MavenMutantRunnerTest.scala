@@ -1,12 +1,12 @@
 package stryker4s.run
 
-import better.files._
 import org.apache.maven.project.MavenProject
 import org.apache.maven.shared.invoker._
 import org.mockito.captor.ArgCaptor
 import org.mockito.{ArgumentMatchersSugar, IdiomaticMockito}
 import stryker4s.config.Config
 import stryker4s.extension.mutationtype.LesserThan
+import stryker4s.files.File
 import stryker4s.model
 import stryker4s.model.{Killed, Survived}
 import stryker4s.mutants.findmutants.SourceCollector
@@ -71,7 +71,7 @@ class MavenMutantRunnerTest extends Stryker4sSuite with IdiomaticMockito with Ar
       val sut = new MavenMutantRunner(new MavenProject(), invokerMock, mock[SourceCollector], mock[Reporter])
 
       val cwd = File.currentWorkingDirectory
-      val result = sut.runMutant(model.Mutant(1, q">", q"<", LesserThan), cwd)(cwd.path)
+      val result = sut.runMutant(model.Mutant(1, q">", q"<", LesserThan), cwd)(cwd)
 
       result shouldBe a[Killed]
     }
@@ -84,7 +84,7 @@ class MavenMutantRunnerTest extends Stryker4sSuite with IdiomaticMockito with Ar
       val sut = new MavenMutantRunner(new MavenProject(), invokerMock, mock[SourceCollector], mock[Reporter])
 
       val cwd = File.currentWorkingDirectory
-      val result = sut.runMutant(model.Mutant(1, q">", q"<", LesserThan), cwd)(cwd.path)
+      val result = sut.runMutant(model.Mutant(1, q">", q"<", LesserThan), cwd)(cwd)
 
       result shouldBe a[Survived]
     }

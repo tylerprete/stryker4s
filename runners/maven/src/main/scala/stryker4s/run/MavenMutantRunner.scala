@@ -2,7 +2,6 @@ package stryker4s.run
 import java.nio.file.Path
 import java.util.Properties
 
-import better.files._
 import org.apache.maven.project.MavenProject
 import org.apache.maven.shared.invoker.{DefaultInvocationRequest, InvocationRequest, Invoker}
 import stryker4s.config.Config
@@ -21,9 +20,9 @@ class MavenMutantRunner(project: MavenProject, invoker: Invoker, sourceCollector
   private val properties = new Properties(project.getProperties)
   properties.setProperty("surefire.skipAfterFailureCount", 1.toString) // Stop after first failure. Only works with surefire plugin, not scalatest
 
-  invoker.setWorkingDirectory(tmpDir.toJava)
+  invoker.setWorkingDirectory(tmpDir.toFile)
 
-  override def runInitialTest(workingDir: File): Boolean = {
+  override def runInitialTest(workingDir: Path): Boolean = {
     val request = createRequest()
 
     val result = invoker.execute(request)
@@ -31,7 +30,7 @@ class MavenMutantRunner(project: MavenProject, invoker: Invoker, sourceCollector
     result.getExitCode == 0
   }
 
-  override def runMutant(mutant: Mutant, workingDir: File): Path => MutantRunResult = {
+  override def runMutant(mutant: Mutant, workingDir: Path): Path => MutantRunResult = {
     val request = createRequestWithMutation(mutant)
 
     val result = invoker.execute(request)
